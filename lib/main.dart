@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'presentation/splash_screen.dart';
+import 'presentation/splash/splash_screen.dart';
 import 'presentation/theme.dart';
 
 void main() => runApp(MyApp());
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: lightTheme,
+      theme: darkTheme,
       home: SplashScreen(),
     );
   }

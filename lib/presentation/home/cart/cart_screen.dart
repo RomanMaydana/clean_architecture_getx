@@ -27,35 +27,38 @@ class CartScreen extends StatelessWidget {
 class _FullCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: ListView.builder(
-                itemCount: products.length,
-                scrollDirection: Axis.horizontal,
-                itemExtent: 230,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return _ShoppingProduct(
-                    product: product,
-                  );
-                }),
-          ),
-        ),
-        Expanded(
-            flex: 2,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AspectRatio(
+            aspectRatio: 1 / 0.7,
+            // color: Colors.blue,
             child: Container(
-              padding: const EdgeInsets.all(15.0),
+              child: ListView.builder(
+                  itemCount: products.length,
+                  scrollDirection: Axis.horizontal,
+                  itemExtent: 230,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return _ShoppingProduct(
+                      product: product,
+                    );
+                  }),
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 0),
               child: Container(
+                // height: 250,
+                // padding: const EdgeInsets.all(15.0),
                 decoration: BoxDecoration(
                   color: Theme.of(context).canvasColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Padding(
@@ -123,16 +126,16 @@ class _FullCart extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Spacer(),
+                    // Spacer(),
                     DeliveryButton(
                       text: 'Checkout',
                       onTap: () {},
                     )
                   ],
                 ),
-              ),
-            ))
-      ],
+              ))
+        ],
+      ),
     );
   }
 }
@@ -144,7 +147,8 @@ class _ShoppingProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      // color: Colors.amber,
       padding: const EdgeInsets.all(15.0),
       child: Stack(children: [
         Card(
@@ -155,6 +159,7 @@ class _ShoppingProduct extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                     flex: 2,
