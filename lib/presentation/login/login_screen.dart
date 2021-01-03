@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                stops: [0.5, 1.0],
+                                // stops: [0.5, 1.0],
                                 colors: deliveryGradients),
                             borderRadius: BorderRadius.vertical(
                                 bottom: Radius.circular(size.width / 2))),

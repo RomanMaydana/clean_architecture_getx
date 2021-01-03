@@ -1,7 +1,8 @@
 import 'package:meta/meta.dart';
 
 class User {
-  const User({@required this.name, @required this.username, this.image});
+  const User(
+      {@required this.name, @required this.username, @required this.image});
 
   final String name;
   final String username;
