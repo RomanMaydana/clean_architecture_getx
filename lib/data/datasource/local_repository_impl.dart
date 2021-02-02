@@ -17,7 +17,7 @@ class LocalReopositoryImp extends LocalRepositoryInterface {
   @override
   Future<String> getToken() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    return sharedPreferences.get(_pref_token);
+    return sharedPreferences.getString(_pref_token);
   }
 
   @override

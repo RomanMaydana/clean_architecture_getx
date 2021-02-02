@@ -1,46 +1,46 @@
+import 'package:arquitecture_clean_getx/presentation/home/cart/cart_controller.dart';
 import 'package:arquitecture_clean_getx/presentation/home/cart/cart_screen.dart';
+import 'package:arquitecture_clean_getx/presentation/home/home_controller.dart';
 import 'package:arquitecture_clean_getx/presentation/home/products/products_screen.dart';
+import 'package:arquitecture_clean_getx/presentation/home/profile/profile_controller.dart';
 import 'package:arquitecture_clean_getx/presentation/home/profile/profile_screen.dart';
 import 'package:arquitecture_clean_getx/presentation/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:get/state_manager.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int currentIndex = 0;
+class HomeScreen extends GetWidget<HomeController> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: Column(
           children: [
-            Expanded(
-                child: IndexedStack(
-              index: currentIndex,
-              children: [
-                ProductsScreeen(),
-                Text('current index ${currentIndex}'),
-                CartScreen(
-                  onShopping: () {
-                    setState(() {
-                      currentIndex = 0;
-                    });
-                  },
-                ),
-                Text('current index ${currentIndex}'),
-                ProfileScreen(),
-              ],
-            )),
-            _DeliveryNavigationBar(
-                index: currentIndex,
-                onIndexSeledcted: (index) {
-                  setState(() {
-                    currentIndex = index;
+            Expanded(child: Obx(() {
+              return IndexedStack(
+                index: controller.currentIndex.value,
+                children: [
+                  ProductsScreeen(),
+                  const Placeholder(),
+                  CartScreen(
+                    onShopping: () {
+                      controller.currentIndex.value = 0;
+                    },
+                  ),
+                  const Placeholder(),
+                  ProfileScreen(),
+                ],
+              );
+            })),
+            Obx(() {
+              return _DeliveryNavigationBar(
+                  index: controller.currentIndex.value,
+                  onIndexSeledcted: (index) {
+                    controller.updateIndexSelected(index);
+                    // setState(() {
+                    //   currentIndex = index;
+                    // });
                   });
-                })
+            })
           ],
         ),
       ),
@@ -51,7 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
 class _DeliveryNavigationBar extends StatelessWidget {
   final int index;
   final ValueChanged<int> onIndexSeledcted;
-  const _DeliveryNavigationBar({Key key, this.index, this.onIndexSeledcted})
+  final controller = Get.find<HomeController>();
+  final cartController = Get.find<CartController>();
+  _DeliveryNavigationBar({Key key, this.index, this.onIndexSeledcted})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -87,15 +89,32 @@ class _DeliveryNavigationBar extends StatelessWidget {
                     onPressed: () => onIndexSeledcted(1)),
               ),
               Material(
-                child: CircleAvatar(
-                    radius: 23,
-                    backgroundColor: DeliveryColors.purple,
-                    child: IconButton(
-                        icon: Icon(Icons.shopping_basket,
-                            color: index == 2
-                                ? DeliveryColors.green
-                                : DeliveryColors.white),
-                        onPressed: () => onIndexSeledcted(2))),
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                        radius: 23,
+                        backgroundColor: DeliveryColors.purple,
+                        child: IconButton(
+                            icon: Icon(Icons.shopping_basket,
+                                color: index == 2
+                                    ? DeliveryColors.green
+                                    : DeliveryColors.white),
+                            onPressed: () => onIndexSeledcted(2))),
+                    Positioned(
+                      right: 0,
+                      child: Obx(
+                        () => cartController.totalItems.value == 0
+                            ? const SizedBox.shrink()
+                            : CircleAvatar(
+                                radius: 10,
+                                backgroundColor: Colors.pinkAccent,
+                                child:
+                                    Text('${cartController.totalItems.value}'),
+                              ),
+                      ),
+                    )
+                  ],
+                ),
               ),
               Material(
                 child: IconButton(
@@ -107,10 +126,15 @@ class _DeliveryNavigationBar extends StatelessWidget {
               ),
               InkWell(
                 onTap: () => onIndexSeledcted(4),
-                child: CircleAvatar(
-                  radius: 15,
-                  backgroundColor: Colors.red,
-                ),
+                child: Obx(() {
+                  final user = controller.user.value;
+                  return user.image == null
+                      ? const SizedBox.shrink()
+                      : CircleAvatar(
+                          radius: 15,
+                          backgroundImage: AssetImage(user.image),
+                        );
+                }),
               )
             ],
           ),

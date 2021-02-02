@@ -1,11 +1,14 @@
 import 'package:arquitecture_clean_getx/data/in_memory_products.dart';
 import 'package:arquitecture_clean_getx/domain/model/product.dart';
+import 'package:arquitecture_clean_getx/domain/model/product_cart.dart';
+import 'package:arquitecture_clean_getx/presentation/home/cart/cart_controller.dart';
 import 'package:arquitecture_clean_getx/presentation/theme.dart';
 import 'package:arquitecture_clean_getx/presentation/widgets/delivery_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/state_manager.dart';
 
-class CartScreen extends StatelessWidget {
-  const CartScreen({Key key, this.onShopping}) : super(key: key);
+class CartScreen extends GetWidget<CartController> {
+  CartScreen({Key key, this.onShopping}) : super(key: key);
 
   final VoidCallback onShopping;
 
@@ -16,7 +19,13 @@ class CartScreen extends StatelessWidget {
             title: Text(
           'Shopping Cart',
         )),
-        body: _FullCart()
+        body: Obx(() {
+          return controller.totalItems.value == 0
+              ? _EmptyCart(
+                  onShopping: onShopping,
+                )
+              : _FullCart();
+        })
         //  _EmptyCart(
         //   onShopping: onShopping,
         // ),
@@ -24,7 +33,7 @@ class CartScreen extends StatelessWidget {
   }
 }
 
-class _FullCart extends StatelessWidget {
+class _FullCart extends GetWidget<CartController> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -36,16 +45,26 @@ class _FullCart extends StatelessWidget {
             aspectRatio: 1 / 0.7,
             // color: Colors.blue,
             child: Container(
-              child: ListView.builder(
-                  itemCount: products.length,
-                  scrollDirection: Axis.horizontal,
-                  itemExtent: 230,
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return _ShoppingProduct(
-                      product: product,
-                    );
-                  }),
+              child: Obx(
+                () => ListView.builder(
+                    itemCount: controller.cartList.length,
+                    scrollDirection: Axis.horizontal,
+                    itemExtent: 230,
+                    itemBuilder: (context, index) {
+                      final productCart = controller.cartList[index];
+                      return _ShoppingProduct(
+                          productCart: productCart,
+                          onDelete: () {
+                            controller.deleteProduct(productCart);
+                          },
+                          onIncrement: () {
+                            controller.increment(productCart);
+                          },
+                          onDecrement: () {
+                            controller.decrement(productCart);
+                          });
+                    }),
+              ),
             ),
           ),
           Padding(
@@ -116,11 +135,14 @@ class _FullCart extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context).accentColor),
                               ),
-                              Text('\$85.00 USD',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).accentColor))
+                              Obx(
+                                () => Text(
+                                    '\$${controller.totalPrice.toStringAsFixed(2)} USD',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).accentColor)),
+                              )
                             ],
                           ),
                         ],
@@ -141,12 +163,22 @@ class _FullCart extends StatelessWidget {
 }
 
 class _ShoppingProduct extends StatelessWidget {
-  const _ShoppingProduct({Key key, this.product}) : super(key: key);
+  const _ShoppingProduct(
+      {Key key,
+      this.productCart,
+      this.onDelete,
+      this.onIncrement,
+      this.onDecrement})
+      : super(key: key);
 
-  final Product product;
+  final ProductCart productCart;
+  final VoidCallback onDelete;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
 
   @override
   Widget build(BuildContext context) {
+    final product = productCart.product;
     return Container(
       // color: Colors.amber,
       padding: const EdgeInsets.all(15.0),
@@ -203,7 +235,7 @@ class _ShoppingProduct extends StatelessWidget {
                         child: Row(
                           children: [
                             InkWell(
-                              onTap: () {},
+                              onTap: onDecrement,
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: DeliveryColors.white,
@@ -217,10 +249,10 @@ class _ShoppingProduct extends StatelessWidget {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text('2'),
+                              child: Text('${productCart.quantity}'),
                             ),
                             InkWell(
-                              onTap: () {},
+                              onTap: onIncrement,
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: DeliveryColors.purple,
@@ -249,7 +281,7 @@ class _ShoppingProduct extends StatelessWidget {
         Positioned(
             right: 0,
             child: InkWell(
-              onTap: () {},
+              onTap: onDelete,
               child: CircleAvatar(
                 backgroundColor: DeliveryColors.pink,
                 child: Icon(Icons.delete_outline),

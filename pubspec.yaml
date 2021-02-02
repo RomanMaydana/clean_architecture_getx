@@ -55,7 +55,7 @@ flutter:
     - assets/delivery/products/image4.jpg
     - assets/delivery/products/image5.jpg
     - assets/delivery/products/image6.jpg
-    
+    - assets/delivery/users/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
